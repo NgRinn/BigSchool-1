@@ -18,11 +18,26 @@ namespace BigSchool_1.Controllers
         {
             _dbContext = new ApplicationDbContext();
         }
+        [Authorize]
+        public ActionResult Create()
+        {
+            var viewModel = new CourseViewModel
+            {
+                Categories = _dbContext.Categories.ToList()
+            };
+            return View(viewModel);
+        }
         // GET: Courses
         [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(CourseViewModel viewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                viewModel.Categories = _dbContext.Categories.ToList();
+                return View("Create", viewModel);
+            }
             var course = new Course
             {
                 LecturerId = User.Identity.GetUserId(),
@@ -35,5 +50,8 @@ namespace BigSchool_1.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+ 
+   
+
     }
 }
